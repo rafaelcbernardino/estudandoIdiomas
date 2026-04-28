@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aula – Estudando Idiomas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="page-content">
+    <nav class="navbar">
+      <div class="container navbar-inner">
+        <a href="/" class="navbar-brand">🌍 Estudando Idiomas</a>
+        <div class="navbar-links">
+          <a href="/">Início</a>
+          <a href="/ingles.html">Inglês</a>
+          <a href="/japones.html">Japonês</a>
+          <a href="/espanhol.html">Espanhol</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <header class="aula-hero animate-fade-up">
+        <a id="back-btn" href="/ingles.html" class="aula-back-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Voltar
+        </a>
+        <div class="aula-hero-text">
+          <h1 id="aula-title">Carregando…</h1>
+          <p id="aula-subtitle"></p>
+        </div>
+      </header>
+
+      <div class="aula-layout">
+
+        <!-- AUDIO PLAYER SECTION -->
+        <div class="section-card animate-fade-up animate-fade-up-delay-1">
+          <div class="section-title">
+            <div class="icon">🎵</div>
+            Áudios da Aula
+          </div>
+          <div id="audio-list" class="audio-list">
+            <p style="color:var(--color-text-muted);font-size:0.9rem">Carregando áudios…</p>
+          </div>
+        </div>
+
+        <!-- HOMEWORK SECTION -->
+        <div class="section-card animate-fade-up animate-fade-up-delay-2">
+          <div class="section-title">
+            <div class="icon">📝</div>
+            Homework
+          </div>
+          <div id="homework-container">
+            <p style="color:var(--color-text-muted);font-size:0.9rem">Carregando exercícios…</p>
+          </div>
+        </div>
+
+        <!-- NOTES SECTION -->
+        <div class="section-card animate-fade-up animate-fade-up-delay-3">
+          <div class="section-title">
+            <div class="icon">✏️</div>
+            Minhas Anotações
+          </div>
+          <textarea
+            id="notes-area"
+            class="notes-area"
+            placeholder="Escreva suas anotações aqui… Tudo é salvo automaticamente. 💾"
+          ></textarea>
+          <div class="notes-footer">
+            <span id="notes-chars" style="color:var(--color-text-dim)">0 caracteres</span>
+            <span class="save-status" id="save-status">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+              Pronto para salvar
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/particles.js"></script>
+  <script src="/js/aula.js"></script>
+</body>
+</html>

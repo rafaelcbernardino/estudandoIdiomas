@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estudando Idiomas 🌍</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- Ambient orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Particle canvas -->
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="page-content">
+    <nav class="navbar">
+      <div class="container navbar-inner">
+        <span class="navbar-brand">🌍 Estudando Idiomas</span>
+        <div class="navbar-links">
+          <a href="/" class="active">Início</a>
+          <a href="/ingles.html">Inglês</a>
+          <a href="/japones.html">Japonês</a>
+          <a href="/espanhol.html">Espanhol</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="hero">
+      <div class="container">
+        <p class="hero-eyebrow animate-fade-up">✦ sua jornada começa aqui ✦</p>
+
+        <h1 class="hero-title animate-fade-up animate-fade-up-delay-1">
+          Aprender nunca foi<br/>
+          <span class="gradient-text">tão descolado.</span>
+        </h1>
+
+        <p class="hero-subtitle animate-fade-up animate-fade-up-delay-2">
+          Clica no idioma que você quer estudar e bora nessa! 🚀
+        </p>
+
+        <div class="lang-cards animate-fade-up animate-fade-up-delay-3">
+
+          <!-- English -->
+          <a href="/ingles.html" class="lang-card" id="card-en">
+            <span class="lang-card-emoji">🇺🇸</span>
+            <div class="lang-card-greeting">Hey! What's up?</div>
+            <div class="lang-card-sub">"E aí, qual é a boa?"</div>
+            <div class="lang-card-label">Inglês</div>
+            <span class="lang-card-btn">
+              Estudar agora
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </span>
+          </a>
+
+          <!-- Japanese -->
+          <a href="/japones.html" class="lang-card" id="card-jp">
+            <span class="lang-card-emoji">🇯🇵</span>
+            <div class="lang-card-greeting">やあ！元気？</div>
+            <div class="lang-card-sub">"E aí, tá bem?"</div>
+            <div class="lang-card-label">Japonês</div>
+            <span class="lang-card-btn">
+              Estudar agora
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </span>
+          </a>
+
+          <!-- Spanish -->
+          <a href="/espanhol.html" class="lang-card" id="card-es">
+            <span class="lang-card-emoji">🇪🇸</span>
+            <div class="lang-card-greeting">¡Hola! ¿Qué tal?</div>
+            <div class="lang-card-sub">"Oi! E aí, como vai?"</div>
+            <div class="lang-card-label">Espanhol</div>
+            <span class="lang-card-btn">
+              Estudar agora
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </span>
+          </a>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/particles.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

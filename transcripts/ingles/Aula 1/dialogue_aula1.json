@@ -1,0 +1,14 @@
+{
+  "title": "Diálogo — Aula 1: What's Up?",
+  "segments": [
+    { "start": 0.0,  "end": 2.5,  "speaker": "Brian", "text": "Hello, good morning!" },
+    { "start": 2.5,  "end": 4.5,  "speaker": "JR",    "text": "Hi, good morning!" },
+    { "start": 4.5,  "end": 6.2,  "speaker": "Brian", "text": "How are you?" },
+    { "start": 6.2,  "end": 8.0,  "speaker": "JR",    "text": "I'm fine and you?" },
+    { "start": 8.0,  "end": 10.0, "speaker": "Brian", "text": "I am great, thanks!" },
+    { "start": 10.0, "end": 12.5, "speaker": "JR",    "text": "You're welcome! What's your name?" },
+    { "start": 12.5, "end": 16.0, "speaker": "Brian", "text": "My name is Brian. And what's your name?" },
+    { "start": 16.0, "end": 20.5, "speaker": "JR",    "text": "I'm Junior Silveira, it's my first time here. Nice to meet you." },
+    { "start": 20.5, "end": 23.0, "speaker": "Brian", "text": "Nice to meet you, too." }
+  ]
+}
