@@ -8,7 +8,14 @@ const AULA_NAME = AULA_PATH.split('/').pop();
 let savedAnswers = {};
 let notesTimer;
 let recognition;
-const inlinePlayers = {};  // { exId: { audio, btn, seek, time } }
+const inlinePlayers = {};
+
+// Song / Karaoke state
+let songData      = null;
+let ytPlayer      = null;
+let karaokeTimer  = null;
+let lyricOffset   = 0;    // seconds to shift timestamps (user calibration)
+let lastActiveIdx = -1;
 
 // ── Page header ───────────────────────────────────────────────────────────
 document.getElementById('aula-title').textContent = AULA_NAME || 'Aula';
@@ -42,10 +49,13 @@ async function init() {
   renderHomework(audioFiles);
   initInlinePlayers(audioFiles);
 
-  // 2️⃣ Full audio section second
+  // 2️⃣ Song section (if available) — injected between HW and audio
+  await loadSongSection();
+
+  // 3️⃣ Full audio section
   renderFullAudioList(audioFiles);
 
-  // 3️⃣ Notes
+  // 4️⃣ Notes
   await loadNotes();
   initNotes();
 }
@@ -593,6 +603,275 @@ async function saveAnswer(exerciseId, itemId, answer) {
       body: JSON.stringify({ exercise_id: exerciseId, item_id: itemId, answer }),
     });
   } catch {}
+}
+
+// ── Song Section (YouTube + Karaoke) ─────────────────────────────────────
+
+async function loadSongSection() {
+  try {
+    const res = await fetch(
+      `/api/song/${COURSE}/${AULA_PATH.split('/').map(encodeURIComponent).join('/')}`
+    );
+    const data = await res.json();
+    if (data && data.youtubeId) {
+      songData = data;
+      injectSongSection(data);
+    }
+  } catch { /* no song, no problem */ }
+}
+
+function injectSongSection(data) {
+  const audioCard = document.getElementById('audio-list').closest('.section-card');
+
+  const card = document.createElement('div');
+  card.className = 'section-card animate-fade-up';
+  card.id = 'song-section';
+  card.innerHTML = buildSongHTML(data);
+  audioCard.parentNode.insertBefore(card, audioCard);
+
+  loadYouTubeAPI().then(() => createYTPlayer(data.youtubeId));
+}
+
+function buildSongHTML(data) {
+  const linesHTML = data.lines.map((line, i) => buildKLine(line, i)).join('');
+
+  return `
+    <div class="section-title">
+      <div class="icon">🎤</div>
+      ${data.title} — ${data.artist}
+      <span class="song-section-badge">🎵 Karaokê</span>
+    </div>
+
+    <p class="song-note">${data.note}</p>
+
+    <div class="song-layout">
+      <!-- YouTube Player -->
+      <div>
+        <div class="yt-responsive" id="yt-wrapper">
+          <div id="yt-player"></div>
+        </div>
+      </div>
+
+      <!-- Karaoke Panel -->
+      <div class="karaoke-panel" id="karaoke-panel">
+        ${linesHTML}
+      </div>
+    </div>
+
+    <div class="karaoke-controls">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost" style="font-size:0.78rem;padding:6px 14px"
+          onclick="ytSeekTo(0)">⏮ Reiniciar</button>
+        <button class="btn btn-ghost" style="font-size:0.78rem;padding:6px 14px"
+          onclick="ytTogglePlay()">⏯ Play/Pause</button>
+      </div>
+
+      <span class="karaoke-time-display" id="karaoke-time">0:00</span>
+
+      <div class="karaoke-offset-wrap">
+        <span>Ajuste de tempo:</span>
+        <input type="range" class="karaoke-offset" id="karaoke-offset"
+          min="-10" max="10" value="0" step="0.5"
+          oninput="setLyricOffset(this.value)" />
+        <span id="karaoke-offset-val">0s</span>
+      </div>
+    </div>`;
+}
+
+function buildKLine(line, idx) {
+  if (!line.text) {
+    return `<div class="kline kline-spacer" id="kline-${idx}"></div>`;
+  }
+
+  const sectionBadge = line.section
+    ? `<span class="kline-section-badge">${line.section}</span>`
+    : '';
+
+  const blankMarkers = (line.blanks || [])
+    .map(b => `<span class="kblank-marker" title="Lacuna ${b.num} do Ex.6">📝 Ex.6 (${b.num})</span>`)
+    .join('');
+
+  // Render words as individual spans for word-level animation
+  const wordSpans = line.text.split(' ')
+    .map((w, wi) => `<span class="kw" id="kw-${idx}-${wi}">${escHtml(w)}</span>`)
+    .join(' ');
+
+  const hasBlanks = line.blanks && line.blanks.length > 0;
+
+  return `
+    <div class="kline${line.section ? ' kline-section-start' : ''}"
+      id="kline-${idx}"
+      data-start="${line.start}"
+      data-end="${line.end}"
+      data-words="${line.text.split(' ').length}"
+      ${hasBlanks ? 'data-has-blank="1"' : ''}>
+      ${sectionBadge}
+      <span class="kline-words">${wordSpans}</span>
+      ${blankMarkers}
+    </div>`;
+}
+
+// ── YouTube IFrame API ────────────────────────────────────────────────────
+
+function loadYouTubeAPI() {
+  return new Promise(resolve => {
+    if (window.YT && window.YT.Player) { resolve(); return; }
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { if (prev) prev(); resolve(); };
+    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+  });
+}
+
+function createYTPlayer(videoId) {
+  ytPlayer = new YT.Player('yt-player', {
+    videoId,
+    width: '100%',
+    height: '100%',
+    playerVars: { rel: 0, modestbranding: 1, iv_load_policy: 3 },
+    events: {
+      onReady: onYTReady,
+      onStateChange: onYTStateChange,
+      onError: onYTError,
+    },
+  });
+}
+
+function onYTReady(e) {
+  // Make iframe fill the responsive container
+  const iframe = e.target.getIframe();
+  iframe.style.width  = '100%';
+  iframe.style.height = '100%';
+}
+
+function onYTStateChange(e) {
+  if (e.data === YT.PlayerState.PLAYING) {
+    startKaraokeSync();
+  } else {
+    stopKaraokeSync();
+    if (e.data === YT.PlayerState.ENDED) resetKaraoke();
+  }
+}
+
+function onYTError() {
+  const wrapper = document.getElementById('yt-wrapper');
+  if (wrapper) {
+    wrapper.innerHTML = `
+      <div class="yt-error">
+        <p>⚠️ Não foi possível carregar o vídeo do YouTube.</p>
+        <p style="margin-top:8px;font-size:0.8rem">
+          <a href="${songData.youtubeUrl}" target="_blank"
+            style="color:var(--color-accent)">Abrir no YouTube ↗</a>
+        </p>
+      </div>`;
+  }
+}
+
+function ytTogglePlay() {
+  if (!ytPlayer) return;
+  const state = ytPlayer.getPlayerState();
+  state === YT.PlayerState.PLAYING ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
+}
+
+function ytSeekTo(seconds) {
+  if (ytPlayer) ytPlayer.seekTo(seconds, true);
+  resetKaraoke();
+}
+
+function setLyricOffset(val) {
+  lyricOffset = parseFloat(val);
+  document.getElementById('karaoke-offset-val').textContent = val + 's';
+}
+
+// ── Karaoke Sync ──────────────────────────────────────────────────────────
+
+function startKaraokeSync() {
+  stopKaraokeSync();
+  karaokeTimer = setInterval(syncKaraoke, 150);
+}
+
+function stopKaraokeSync() {
+  clearInterval(karaokeTimer);
+  karaokeTimer = null;
+}
+
+function resetKaraoke() {
+  document.querySelectorAll('.kline').forEach(el => {
+    el.classList.remove('kline-active', 'kline-upcoming', 'kline-past');
+  });
+  lastActiveIdx = -1;
+}
+
+function syncKaraoke() {
+  if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+
+  const rawTime    = ytPlayer.getCurrentTime();
+  const currentTime = rawTime + lyricOffset;
+
+  // Update time display
+  const timeEl = document.getElementById('karaoke-time');
+  if (timeEl) timeEl.textContent = fmt(rawTime);
+
+  const lines = songData.lines;
+  let activeIdx = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    if (currentTime >= lines[i].start && currentTime < lines[i].end) {
+      activeIdx = i;
+      break;
+    }
+  }
+
+  // Nothing changed — just update word highlight within active line
+  if (activeIdx === lastActiveIdx) {
+    if (activeIdx >= 0) updateWordHighlight(activeIdx, currentTime);
+    return;
+  }
+
+  lastActiveIdx = activeIdx;
+
+  // Update all line classes
+  document.querySelectorAll('.kline').forEach((el, i) => {
+    el.classList.remove('kline-active', 'kline-upcoming', 'kline-past');
+    if (i === activeIdx) {
+      el.classList.add('kline-active');
+    } else if (i > activeIdx && i <= activeIdx + 3) {
+      el.classList.add('kline-upcoming');
+    } else if (i < activeIdx) {
+      el.classList.add('kline-past');
+    }
+  });
+
+  // Scroll active line into center of panel
+  if (activeIdx >= 0) {
+    const lineEl = document.getElementById(`kline-${activeIdx}`);
+    lineEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    updateWordHighlight(activeIdx, currentTime);
+  }
+}
+
+function updateWordHighlight(lineIdx, currentTime) {
+  const line      = songData.lines[lineIdx];
+  if (!line || !line.text) return;
+
+  const words    = line.text.split(' ');
+  const duration = line.end - line.start;
+  if (duration <= 0) return;
+
+  const elapsed     = currentTime - line.start;
+  const wordDuration = duration / words.length;
+  const litCount    = Math.min(Math.floor(elapsed / wordDuration) + 1, words.length);
+
+  words.forEach((_, wi) => {
+    const wEl = document.getElementById(`kw-${lineIdx}-${wi}`);
+    if (!wEl) return;
+    wEl.classList.remove('kw-done', 'kw-lit');
+    if (wi < litCount - 1)      wEl.classList.add('kw-done');
+    else if (wi === litCount - 1) wEl.classList.add('kw-lit');
+  });
 }
 
 // ── Full Audio Section (below homework) ──────────────────────────────────

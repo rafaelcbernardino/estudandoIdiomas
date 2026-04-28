@@ -1017,10 +1017,212 @@ textarea.hw-match-input {
 .animate-fade-up-delay-2 { animation-delay: 0.2s; }
 .animate-fade-up-delay-3 { animation-delay: 0.3s; }
 
+/* ── Song Section ── */
+.song-note {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-bottom: 20px;
+  padding: 8px 12px;
+  background: rgba(116,17,160,0.12);
+  border-left: 3px solid var(--color-primary-light);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.song-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Responsive YouTube player */
+.yt-responsive {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: #000;
+  box-shadow: var(--shadow-card);
+}
+.yt-responsive iframe,
+.yt-responsive > div {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.yt-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 16px;
+}
+
+/* ── Karaoke Panel ── */
+.karaoke-panel {
+  height: 380px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.karaoke-panel::-webkit-scrollbar { width: 4px; }
+.karaoke-panel::-webkit-scrollbar-track { background: transparent; }
+.karaoke-panel::-webkit-scrollbar-thumb { background: var(--color-primary); border-radius: 2px; }
+
+.kline {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.25);
+  transition: all 0.25s ease;
+  cursor: default;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kline.kline-spacer {
+  min-height: 10px;
+  padding: 0;
+}
+
+.kline.kline-section-start {
+  padding-top: 10px;
+}
+
+.kline-section-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-primary-light);
+  background: rgba(116,17,160,0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.25s;
+  flex-shrink: 0;
+}
+
+.kline.kline-upcoming { color: rgba(255,255,255,0.55); }
+
+.kline.kline-active {
+  color: var(--color-accent);
+  font-size: 1rem;
+  font-weight: 700;
+  text-shadow: 0 0 16px rgba(166,227,18,0.5), 0 0 32px rgba(166,227,18,0.2);
+  background: rgba(166,227,18,0.06);
+  border: 1px solid rgba(166,227,18,0.15);
+  padding: 10px 12px;
+}
+.kline.kline-active .kline-section-badge { opacity: 1; }
+
+.kline-words { display: inline; }
+
+/* Word-level highlight within active line */
+.kw { transition: color 0.15s, text-shadow 0.15s; }
+.kw.kw-lit  { color: #fff; }
+.kw.kw-done { color: var(--color-accent); }
+
+/* Blank word marker in lyrics */
+.kblank-marker {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: rgba(116,17,160,0.5);
+  color: var(--color-primary-light);
+  border: 1px solid var(--color-primary-light);
+  border-radius: 4px;
+  padding: 1px 5px;
+  vertical-align: middle;
+  margin-left: 4px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+.kline.kline-active .kblank-marker {
+  background: rgba(166,227,18,0.15);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Karaoke controls bar */
+.karaoke-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.karaoke-time-display {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--color-accent);
+  min-width: 60px;
+}
+
+.karaoke-offset-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.karaoke-offset {
+  width: 80px;
+  accent-color: var(--color-accent);
+}
+
+.song-section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-left: 10px;
+  vertical-align: middle;
+  box-shadow: 0 2px 8px rgba(116,17,160,0.5);
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .lang-cards { flex-direction: column; align-items: center; }
   .lang-card { width: 100%; max-width: 340px; }
   .hw-match-grid { grid-template-columns: auto 1fr; }
   .hw-match-label { border-right: none; }
+  .song-layout { grid-template-columns: 1fr; }
+  .karaoke-panel { height: 260px; }
 }

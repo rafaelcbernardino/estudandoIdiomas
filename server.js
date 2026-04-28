@@ -220,6 +220,18 @@ app.post('/api/homework/:course/:aula', (req, res) => {
   res.json({ success: true });
 });
 
+// Song data (YouTube + timed lyrics)
+app.get('/api/song/:course/*', (req, res) => {
+  const { course } = req.params;
+  const aulaPath   = req.params[0];
+  const songFile   = path.join(__dirname, 'songs', course, aulaPath, 'song.json');
+  if (fs.existsSync(songFile)) {
+    try { return res.json(JSON.parse(fs.readFileSync(songFile, 'utf8'))); }
+    catch { return res.status(500).json({ error: 'Erro ao ler song.json' }); }
+  }
+  res.json(null);
+});
+
 // ── SPA fallback ───────────────────────────────────────────────────────────
 
 app.get('*', (req, res) => {
