@@ -20,7 +20,9 @@ let lastActiveIdx = -1;
 // ── Page header ───────────────────────────────────────────────────────────
 document.getElementById('aula-title').textContent = AULA_NAME || 'Aula';
 document.getElementById('aula-subtitle').textContent =
-  AULA_PATH.includes('/') ? AULA_PATH.split('/')[0] : 'Inglês — Junior Silveira';
+  AULA_PATH.includes('/')
+    ? AULA_PATH.split('/')[0]
+    : /^Extra\s*Class/i.test(AULA_NAME) ? 'Extra Class — Inglês' : 'Inglês — Junior Silveira';
 document.getElementById('back-btn').href = `/${COURSE}.html`;
 
 // ── Init ──────────────────────────────────────────────────────────────────

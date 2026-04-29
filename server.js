@@ -48,27 +48,27 @@ function buildStructure(cPath) {
   modDirs.forEach(mod => {
     const modPath = path.join(cPath, mod);
     const aulas = fs.readdirSync(modPath, { withFileTypes: true })
-      .filter(d => d.isDirectory() && /^Aula\s*\d+/i.test(d.name))
+      .filter(d => d.isDirectory() && isLesson(d.name))
       .map(d => d.name)
-      .sort((a, b) => numOf(a) - numOf(b))
+      .sort(sortLesson)
       .map(aula => aulaInfo(path.join(modPath, aula), `${mod}/${aula}`));
 
     structure.push({ name: mod, number: numOf(mod), aulas });
   });
 
-  const rootAulas = entries
-    .filter(n => /^Aula\s*\d+/i.test(n))
-    .sort((a, b) => numOf(a) - numOf(b));
+  const rootLessons = entries
+    .filter(n => isLesson(n))
+    .sort(sortLesson);
 
-  if (rootAulas.length > 0) {
+  if (rootLessons.length > 0) {
     let mod1 = structure.find(m => m.number === 1);
     if (!mod1) {
       mod1 = { name: 'Módulo 1', number: 1, aulas: [] };
       structure.unshift(mod1);
     }
-    rootAulas.forEach(aula => {
-      if (!mod1.aulas.find(a => a.name === aula)) {
-        mod1.aulas.push(aulaInfo(path.join(cPath, aula), aula));
+    rootLessons.forEach(lesson => {
+      if (!mod1.aulas.find(a => a.name === lesson)) {
+        mod1.aulas.push(aulaInfo(path.join(cPath, lesson), lesson));
       }
     });
   }
@@ -80,12 +80,24 @@ function buildStructure(cPath) {
 function aulaInfo(aulaPath, relPath) {
   const hwPath = path.join(aulaPath, 'Homeworks');
   const files = fs.existsSync(hwPath) ? fs.readdirSync(hwPath) : [];
+  const name = path.basename(aulaPath);
   return {
-    name: path.basename(aulaPath),
+    name,
     path: relPath,
+    type: /^Extra\s*Class/i.test(name) ? 'extraClass' : 'aula',
     audioFiles: files.filter(f => /\.(mp3|wav|ogg|m4a)$/i.test(f)).sort(),
     pdfFiles: files.filter(f => /\.pdf$/i.test(f)).sort(),
   };
+}
+
+function isLesson(name) {
+  return /^Aula\s*\d+/i.test(name) || /^Extra\s*Class\s*\d+/i.test(name);
+}
+
+function sortLesson(a, b) {
+  const na = numOf(a), nb = numOf(b);
+  if (na !== nb) return na - nb;
+  return (/^Extra/i.test(a) ? 1 : 0) - (/^Extra/i.test(b) ? 1 : 0);
 }
 
 function numOf(str) {
