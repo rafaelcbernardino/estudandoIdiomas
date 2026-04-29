@@ -204,6 +204,7 @@ const AUDIO_MAPS = {
   'Aula 1': { ex1: 'dialogue_aula1.mp3', ex2: 'homework1_ex2.mp3', ex3: 'homework1_ex3.mp3', ex4: 'homework1_ex4.mp3' },
   'Aula 2': { ex1: 'homework2_ex1.mp3', ex2: 'homework2_ex2.mp3', ex3: 'homework2_ex3.mp3', ex4: 'homework2_ex4.mp3', ex5: 'homework2_ex5.mp3' },
   'Aula 3': { ex1: 'dialogue_aula3.mp3', ex2: 'homework3_ex2.mp3', ex3: 'homework3_ex3.mp3', ex4: 'homework3_ex4.mp3', ex5: 'homework3_ex5.mp3' },
+  'Aula 4': { ex1: 'homework4_ex1.mp3', ex2: 'homework4_ex2.mp3', ex3: 'homework4_ex3.mp3', ex4: 'homework4_ex4.mp3', ex5: 'homework4_ex5.mp3' },
 };
 function getAudioMap() { return AUDIO_MAPS[AULA_NAME] || {}; }
 
@@ -266,6 +267,8 @@ function renderHomework(audioFiles) {
     container.innerHTML = buildHW2(audioFiles);
   } else if (AULA_NAME === 'Aula 3') {
     container.innerHTML = buildHW3(audioFiles);
+  } else if (AULA_NAME === 'Aula 4') {
+    container.innerHTML = buildHW4(audioFiles);
   } else {
     container.innerHTML = buildHWGeneric(audioFiles);
   }
@@ -448,6 +451,55 @@ const HW3_EX5_Q = [
 const HW3_EX5_A = [
   'Where are you from?', "I'm from England.", 'Where is she from?',
   "She's from Spain.", 'They are friends.',
+];
+
+// ── HW4 data ──────────────────────────────────────────────────────────────
+
+const HW4_EX1_FULL  = ['I AM', 'YOU ARE', 'HE IS', 'SHE IS', 'IT IS', 'WE ARE', 'THEY ARE'];
+const HW4_EX1_CONTR = ["I'm", "You're", "He's", "She's", "It's", "We're", "They're"];
+
+const HW4_EX2_ITEMS = [
+  { pre: 'I',     blank: 'am',  post: 'Japanese.'  },
+  { pre: 'She',   blank: 'is',  post: 'Canadian.'  },
+  { pre: 'He',    blank: 'is',  post: 'Brazilian.' },
+  { pre: 'We',    blank: 'are', post: 'American.'  },
+  { pre: 'Where', blank: 'are', post: 'you from?'  },
+];
+
+const HW4_EX3_Q = [
+  "She's from Colombia.",
+  "He's from Spain.",
+  "I'm from Australia.",
+  "They're from Jamaica.",
+  "We're from the USA.",
+];
+const HW4_EX3_A = [
+  "She isn't from Colombia.",
+  "He isn't from Spain.",
+  "I'm not from Australia.",
+  "They aren't from Jamaica.",
+  "We aren't from the USA.",
+];
+
+const HW4_EX4_GIVEN_A = [
+  "They're from Germany.",
+  "I'm from France.",
+  "Yes, I'm new here.",
+  "No, she's American.",
+];
+const HW4_EX4_Q = [
+  'Where are they from?',
+  'Where are you from?',
+  'Are you new here?',
+  'Is she Brazilian?',
+];
+
+const HW4_EX5_QUESTIONS = [
+  { sentence: 'Shakira _____ from Colombia.',    options: ['are','am','is'], correct: 'c' },
+  { sentence: 'David Beckham _____ from England.', options: ['are','am','is'], correct: 'c' },
+  { sentence: 'I _____ Junior.',                 options: ['are','am','is'], correct: 'b' },
+  { sentence: 'Where _____ you from?',           options: ['are','am','is'], correct: 'a' },
+  { sentence: 'Where _____ she from?',           options: ['are','am','is'], correct: 'c' },
 ];
 
 // ── HW1 Builder ───────────────────────────────────────────────────────────
@@ -1119,6 +1171,244 @@ function buildHW3(audioFiles) {
   `;
 }
 
+// ── HW4 check functions ───────────────────────────────────────────────────
+
+function checkHW4Ex1() {
+  HW4_EX1_FULL.forEach((_, i) => {
+    const inp = document.getElementById(`hw4ex1-item${i}`);
+    const fb  = document.getElementById(`fb-hw4ex1-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, HW4_EX1_CONTR[i]));
+  });
+}
+
+function checkHW4Ex2() {
+  HW4_EX2_ITEMS.forEach((item, i) => {
+    const inp = document.getElementById(`hw4ex2-item${i}`);
+    const fb  = document.getElementById(`fb-hw4ex2-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, item.blank));
+  });
+}
+
+function checkHW4Ex3() {
+  HW4_EX3_Q.forEach((_, i) => {
+    const inp = document.getElementById(`hw4ex3-item${i}`);
+    const fb  = document.getElementById(`fb-hw4ex3-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, HW4_EX3_A[i]));
+  });
+}
+
+function checkHW4Ex4() {
+  HW4_EX4_GIVEN_A.forEach((_, i) => {
+    const inp = document.getElementById(`hw4ex4-item${i}`);
+    const fb  = document.getElementById(`fb-hw4ex4-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, HW4_EX4_Q[i]));
+  });
+}
+
+function checkHW4Ex5() {
+  HW4_EX5_QUESTIONS.forEach((q, i) => {
+    const selected = document.querySelector(`input[name="hw4ex5-q${i}"]:checked`);
+    const fb = document.getElementById(`fb-hw4ex5-${i}`);
+    if (!fb) return;
+    if (!selected) { fb.innerHTML = ''; return; }
+    fb.innerHTML = selected.value === q.correct
+      ? '<span class="fb-correct">✓ Correto!</span>'
+      : '<span class="fb-incorrect">✗ Incorreto. Tente novamente!</span>';
+    saveAnswer('hw4ex5', 'q' + i, selected.value);
+  });
+}
+
+// ── HW4 Builder ───────────────────────────────────────────────────────────
+
+function buildHW4(audioFiles) {
+  const letters = ['a','b','c','d','e','f','g'];
+
+  return `
+    <div class="hw-obs">
+      Obs.: A quantidade de exercícios e o grau de dificuldade aumentarão de acordo com sua evolução no curso.
+    </div>
+
+    <h2 style="font-size:1.2rem;font-weight:800;color:var(--color-accent);margin-bottom:28px">
+      Aula 4 – What's your nationality?
+    </h2>
+
+    <!-- Exercise 1: Contractions of TO BE -->
+    <div class="hw-exercise">
+      ${exHeader(1, 'Write the contractions of the verb TO BE:', '(Escreva as formas contraídas do verbo TO BE)', audioFiles, 'ex1')}
+
+      <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:20px;border:1px solid var(--color-border);max-width:420px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--color-text-muted)">
+          <div>Forma completa</div><div>Contração</div>
+        </div>
+        ${HW4_EX1_FULL.map((full, i) => `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center;margin-bottom:8px">
+            <div style="font-weight:700;color:var(--color-accent);font-size:0.9rem">${full}</div>
+            <div>
+              <input type="text" class="hw-match-input" id="hw4ex1-item${i}"
+                placeholder="contração…"
+                value="${escHtml(getSaved('hw4ex1','item'+i))}"
+                oninput="saveAnswer('hw4ex1','item${i}',this.value)" />
+              <div class="check-feedback" id="fb-hw4ex1-${i}"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW4Ex1()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw4ex1-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw4ex1-key">
+        <strong>Gabarito:</strong>
+        ${HW4_EX1_FULL.map((f, i) => `${f} → ${HW4_EX1_CONTR[i]}`).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>
+
+    <!-- Exercise 2: Complete with TO BE -->
+    <div class="hw-exercise">
+      ${exHeader(2, 'Complete with the correct form of the verb TO BE:', '(Complete com a forma correta do verbo TO BE)', audioFiles, 'ex2')}
+
+      <div class="hw-translate-list">
+        ${HW4_EX2_ITEMS.map((item, i) => `
+          <div class="hw-translate-item">
+            <div class="hw-translate-question" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="color:var(--color-accent);font-weight:700">${letters[i]})</span>
+              <span>${item.pre}</span>
+              <input type="text" class="hw-match-input" id="hw4ex2-item${i}"
+                placeholder="verbo…"
+                value="${escHtml(getSaved('hw4ex2','item'+i))}"
+                oninput="saveAnswer('hw4ex2','item${i}',this.value)"
+                style="width:80px;display:inline-block" />
+              <span>${item.post}</span>
+            </div>
+            <div class="check-feedback" id="fb-hw4ex2-${i}"></div>
+          </div>`).join('')}
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW4Ex2()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw4ex2-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw4ex2-key">
+        <strong>Gabarito:</strong>
+        ${HW4_EX2_ITEMS.map((item, i) => `${letters[i]}) ${item.blank}`).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>
+
+    <!-- Exercise 3: Negative form -->
+    <div class="hw-exercise">
+      ${exHeader(3, 'Put the sentences in the negative form:', '(Coloque as frases na forma negativa)', audioFiles, 'ex3')}
+
+      <div class="hw-translate-list">
+        ${HW4_EX3_Q.map((q, i) => `
+          <div class="hw-translate-item">
+            <div class="hw-translate-question">
+              <span style="color:var(--color-accent);font-weight:700">${letters[i]})</span>
+              <span style="color:var(--color-text-muted)">${q}</span>
+            </div>
+            <input type="text" class="hw-match-input" id="hw4ex3-item${i}"
+              placeholder="Forma negativa…"
+              value="${escHtml(getSaved('hw4ex3','item'+i))}"
+              oninput="saveAnswer('hw4ex3','item${i}',this.value)" />
+            <div class="check-feedback" id="fb-hw4ex3-${i}"></div>
+          </div>`).join('')}
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW4Ex3()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw4ex3-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw4ex3-key">
+        <strong>Gabarito:</strong><br>
+        ${HW4_EX3_A.map((a, i) => `${letters[i]}) ${a}`).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>
+
+    <!-- Exercise 4: Write questions for these answers -->
+    <div class="hw-exercise">
+      ${exHeader(4, 'Write questions for these answers:', '(Escreva perguntas para estas respostas)', audioFiles, 'ex4')}
+
+      <div class="hw-translate-list">
+        ${HW4_EX4_GIVEN_A.map((ans, i) => `
+          <div class="hw-translate-item">
+            <div style="margin-bottom:6px">
+              <span style="color:var(--color-accent);font-weight:700">${letters[i]})</span>
+              <input type="text" class="hw-match-input" id="hw4ex4-item${i}"
+                placeholder="Pergunta em inglês…?"
+                value="${escHtml(getSaved('hw4ex4','item'+i))}"
+                oninput="saveAnswer('hw4ex4','item${i}',this.value)"
+                style="width:min(100%,380px)" />
+              <span style="font-size:0.82rem;color:var(--color-text-muted)"> ?</span>
+            </div>
+            <div style="font-size:0.85rem;color:var(--color-text-muted);padding-left:20px;margin-bottom:4px">↳ ${ans}</div>
+            <div class="check-feedback" id="fb-hw4ex4-${i}"></div>
+          </div>`).join('')}
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW4Ex4()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw4ex4-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw4ex4-key">
+        <strong>Gabarito:</strong><br>
+        ${HW4_EX4_Q.map((q, i) => `${letters[i]}) ${q}`).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>
+
+    <!-- Exercise 5: Multiple choice -->
+    <div class="hw-exercise">
+      ${exHeader(5, 'Choose the correct option:', '(Escolha a resposta correta)', audioFiles, 'ex5')}
+
+      <div class="hw-translate-list">
+        ${HW4_EX5_QUESTIONS.map((q, i) => `
+          <div class="hw-translate-item" style="padding:12px 0">
+            <div class="hw-translate-question" style="margin-bottom:10px">
+              <span style="color:var(--color-accent);font-weight:700">${i+1}.</span>
+              ${q.sentence}
+            </div>
+            <div style="display:flex;gap:20px;flex-wrap:wrap">
+              ${q.options.map((opt, oi) => {
+                const letter = String.fromCharCode(97 + oi);
+                const saved  = getSaved('hw4ex5', 'q' + i);
+                return `<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.88rem">
+                  <input type="radio" name="hw4ex5-q${i}" value="${letter}"
+                    ${saved === letter ? 'checked' : ''}
+                    onchange="saveAnswer('hw4ex5','q${i}','${letter}')" />
+                  ${letter}) ${opt}
+                </label>`;
+              }).join('')}
+            </div>
+            <div class="check-feedback" id="fb-hw4ex5-${i}" style="margin-top:6px"></div>
+          </div>`).join('')}
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW4Ex5()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw4ex5-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw4ex5-key">
+        <strong>Gabarito:</strong>
+        ${HW4_EX5_QUESTIONS.map((q, i) => `${i+1}) ${q.correct}`).join(' &nbsp;|&nbsp; ')}
+        <br><span style="font-size:0.8rem;color:var(--color-text-muted)">
+          1-is &nbsp;|&nbsp; 2-is &nbsp;|&nbsp; 3-am &nbsp;|&nbsp; 4-are &nbsp;|&nbsp; 5-is
+        </span>
+      </div>
+    </div>
+
+    <!-- Exercise 6 -->
+    <div class="hw-exercise">
+      <div class="hw-exercise-header">
+        <div class="hw-ex-meta">
+          <div class="hw-exercise-title">6. Repeat the sentences from exercises 1 to 5 along with the audio:</div>
+          <div class="hw-exercise-subtitle">(Repita as frases dos exercícios 1 a 5 junto com o áudio)</div>
+        </div>
+      </div>
+      <p style="font-size:0.88rem;color:var(--color-text-muted);padding:4px 0">
+        ☝️ Use os mini-players ao lado de cada exercício acima, ou o player completo na seção abaixo.
+      </p>
+    </div>
+  `;
+}
+
 // ── Generic HW fallback (aulas futuras) ──────────────────────────────────
 
 function buildHWGeneric(audioFiles) {
@@ -1448,6 +1738,12 @@ function friendlyName(filename) {
     'homework3_ex3.mp3':   '📢 Exercício 3',
     'homework3_ex4.mp3':   '📢 Exercício 4',
     'homework3_ex5.mp3':   '📢 Exercício 5',
+    'homework4_ex1.mp3':   '📢 Exercício 1',
+    'homework4_ex2.mp3':   '📢 Exercício 2',
+    'homework4_ex3.mp3':   '📢 Exercício 3',
+    'homework4_ex4.mp3':   '📢 Exercício 4',
+    'homework4_ex5.mp3':   '📢 Exercício 5',
+    'Nationality.mp3':     '🌍 Nacionalidades',
   };
   return map[filename] || ('🎵 ' + filename.replace(/\.[^.]+$/, '').replace(/_/g, ' '));
 }
