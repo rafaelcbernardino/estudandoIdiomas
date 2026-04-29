@@ -197,13 +197,13 @@ function toggleAnswerKey(id) {
 
 // ── Inline Audio Players (inside exercises) ───────────────────────────────
 
-// Maps exercise id → audio filename for Aula 1
-const AULA1_AUDIO_MAP = {
-  ex1: 'dialogue_aula1.mp3',
-  ex2: 'homework1_ex2.mp3',
-  ex3: 'homework1_ex3.mp3',
-  ex4: 'homework1_ex4.mp3',
+// Maps exercise id → audio filename per Aula
+const AUDIO_MAPS = {
+  'Aula 1': { ex1: 'dialogue_aula1.mp3', ex2: 'homework1_ex2.mp3', ex3: 'homework1_ex3.mp3', ex4: 'homework1_ex4.mp3' },
+  'Aula 2': { ex1: 'homework2_ex1.mp3', ex2: 'homework2_ex2.mp3', ex3: 'homework2_ex3.mp3', ex4: 'homework2_ex4.mp3', ex5: 'homework2_ex5.mp3' },
+  'Aula 3': { ex1: 'dialogue_aula3.mp3', ex2: 'homework3_ex2.mp3', ex3: 'homework3_ex3.mp3', ex4: 'homework3_ex4.mp3', ex5: 'homework3_ex5.mp3' },
 };
+function getAudioMap() { return AUDIO_MAPS[AULA_NAME] || {}; }
 
 function buildInlinePlayerHtml(exId, filename) {
   return `
@@ -219,7 +219,7 @@ function buildInlinePlayerHtml(exId, filename) {
 }
 
 function initInlinePlayers(audioFiles) {
-  Object.entries(AULA1_AUDIO_MAP).forEach(([exId, filename]) => {
+  Object.entries(getAudioMap()).forEach(([exId, filename]) => {
     if (!audioFiles.includes(filename)) return;
 
     const audio = document.getElementById(`ipa-${exId}`);
@@ -260,11 +260,12 @@ function renderHomework(audioFiles) {
   const container = document.getElementById('homework-container');
   if (AULA_NAME === 'Aula 1') {
     container.innerHTML = buildHW1(audioFiles);
+  } else if (AULA_NAME === 'Aula 2') {
+    container.innerHTML = buildHW2(audioFiles);
+  } else if (AULA_NAME === 'Aula 3') {
+    container.innerHTML = buildHW3(audioFiles);
   } else {
-    container.innerHTML = `
-      <p style="color:var(--color-text-muted);font-size:0.9rem;text-align:center;padding:24px 0">
-        📄 O homework desta aula será exibido assim que disponível.
-      </p>`;
+    container.innerHTML = buildHWGeneric(audioFiles);
   }
 }
 
@@ -365,6 +366,88 @@ const SONG_SEGMENTS = [
   { type:'text',  text:"Doesn't tear you apart anymore" },
 ];
 
+// ── HW2 data ──────────────────────────────────────────────────────────────
+
+const HW2_EX1_Q = [
+  'Como você está?', 'Como você está indo?', 'Como estão as coisas?',
+  'Eu estou ótimo.', 'Meu nome é Jéssica.', 'Meu nome completo é Sarah Jones.',
+  'Prazer em conhecê-lo.', 'Muito obrigado.', 'De nada.', 'Adeus.',
+  'Te vejo mais tarde.', 'Tenha um bom dia!', 'Tenha um bom final de semana!',
+];
+const HW2_EX1_A = [
+  'How are you?', 'How are you doing?', 'How are things?',
+  "I'm great.", 'My name is Jessica.', 'My full name is Sarah Jones.',
+  'Nice to meet you.', 'Thank you.', "You're welcome.", 'Goodbye.',
+  'See you later.', 'Have a nice day.', 'Have a nice weekend.',
+];
+
+const HW2_EX2_PICS = [
+  { emoji: '🌅', scene: 'Criança acordando na cama com sol pela janela', answer: 'Good morning' },
+  { emoji: '🌆', scene: 'Casal jantando à luz de velas ao pôr do sol', answer: 'Good evening' },
+  { emoji: '🌙', scene: 'Pessoa dormindo sob luz azul da lua', answer: 'Good night' },
+  { emoji: '☀️', scene: 'Família almoçando juntos durante o dia', answer: 'Good afternoon' },
+];
+
+const HW2_EX3_Q = [
+  'Have nice day!', "What's full name?", 'What are you?', 'Tank you.', 'Nice to meat you.',
+];
+const HW2_EX3_A = [
+  'Have a nice day!', "What's your full name?", 'How are you?', 'Thank you.', 'Nice to meet you.',
+];
+
+const HW2_EX4_SCRAMBLED = [
+  'have / how / been / you?', 'things / are / how?', 'you / to / meet / glad.',
+  'afternoon / good.', 'you / soon / to / talk.',
+];
+const HW2_EX4_A = [
+  'How have you been?', 'How are things?', 'Glad to meet you.',
+  'Good afternoon.', 'Talk to you soon.',
+];
+
+const HW2_EX5_Q = [
+  "What's your name?", 'Where are you from?', 'How old are you?',
+  'Do you have brothers or sisters?', 'Do you work?',
+];
+
+// ── HW3 data ──────────────────────────────────────────────────────────────
+
+const HW3_EX1_LINES = [
+  { speaker: 'Jr',    text: "No, I'm from Sao Paulo.",                                        bold: false },
+  { speaker: 'Brian', text: 'So, tell me Junior... where are you from?',                       bold: true  },
+  { speaker: 'Jr',    text: 'Great! Where are you from in the USA?',                           bold: false },
+  { speaker: 'Brian', text: 'Nice! São Paulo is a big city.',                                  bold: true  },
+  { speaker: 'Jr',    text: "I'm from Brazil, what about you?",                                bold: false },
+  { speaker: 'Brian', text: "I'm from the USA.",                                               bold: true  },
+  { speaker: 'Jr',    text: 'Yes, it is.',                                                     bold: false },
+  { speaker: 'Brian', text: "I'm from San Francisco. And you? Are you from Rio de Janeiro?",  bold: true  },
+];
+const HW3_EX1_ANSWERS = ['6', '1', '4', '7', '2', '3', '8', '5'];
+
+const HW3_COUNTRIES     = ['Brazil','The USA','Canada','France','Australia','Colombia','Spain','Germany','England','Jamaica'];
+const HW3_NATIONALITIES = ['Brazilian','American','Canadian','French','Australian','Colombian','Spanish','German','English','Jamaican'];
+
+const HW3_EX3_FLAGS = [
+  { emoji: '🇨🇴', name: 'Colombia' },
+  { emoji: '🇫🇷', name: 'France'   },
+  { emoji: '🇧🇷', name: 'Brazil'   },
+  { emoji: '🇺🇸', name: 'The USA'  },
+];
+
+const HW3_EX4_PEOPLE = [
+  { label: 'b)', hint: 'Rainha do Reino Unido (Queen of the United Kingdom)', answer: "She's Queen Elizabeth II. She's from England." },
+  { label: 'c)', hint: 'Ator americano, famoso pelo filme Titanic',            answer: "He's Leonardo Di Caprio. He's from the USA."   },
+  { label: 'd)', hint: 'Piloto de Fórmula 1, multicampeão alemão',            answer: "He's Michael Schumacher. He's from Germany."   },
+];
+
+const HW3_EX5_Q = [
+  'De onde você é?', 'Eu sou da Inglaterra.', 'De onde ela é?',
+  'Ela é da Espanha.', 'Elas são amigas.',
+];
+const HW3_EX5_A = [
+  'Where are you from?', "I'm from England.", 'Where is she from?',
+  "She's from Spain.", 'They are friends.',
+];
+
 // ── HW1 Builder ───────────────────────────────────────────────────────────
 
 function getSaved(exId, itemId) {
@@ -372,8 +455,10 @@ function getSaved(exId, itemId) {
 }
 
 function exHeader(num, title, subtitle, audioFiles, exKey) {
-  const hasAudio = exKey && audioFiles.includes(AULA1_AUDIO_MAP[exKey]);
-  const playerHtml = hasAudio ? buildInlinePlayerHtml(exKey, AULA1_AUDIO_MAP[exKey]) : '';
+  const audioMap = getAudioMap();
+  const filename = exKey && audioMap[exKey];
+  const hasAudio = filename && audioFiles.includes(filename);
+  const playerHtml = hasAudio ? buildInlinePlayerHtml(exKey, filename) : '';
   return `
     <div class="hw-exercise-header">
       <div class="hw-ex-meta">
@@ -590,6 +675,464 @@ function buildSongLyrics() {
 
 function escHtml(str) {
   return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── HW2 check functions ───────────────────────────────────────────────────
+
+function checkHW2Ex1() {
+  HW2_EX1_Q.forEach((_, i) => {
+    const inp = document.getElementById(`hw2ex1-item${i}`);
+    const fb  = document.getElementById(`fb-hw2ex1-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, HW2_EX1_A[i]));
+  });
+}
+
+function checkHW2Ex2() {
+  HW2_EX2_PICS.forEach((pic, i) => {
+    const inp = document.getElementById(`hw2ex2-item${i}`);
+    const fb  = document.getElementById(`fb-hw2ex2-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, pic.answer));
+  });
+}
+
+function checkHW2Ex3() {
+  HW2_EX3_Q.forEach((_, i) => {
+    const inp = document.getElementById(`hw2ex3-item${i}`);
+    const fb  = document.getElementById(`fb-hw2ex3-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, HW2_EX3_A[i]));
+  });
+}
+
+function checkHW2Ex4() {
+  HW2_EX4_SCRAMBLED.forEach((_, i) => {
+    const inp = document.getElementById(`hw2ex4-item${i}`);
+    const fb  = document.getElementById(`fb-hw2ex4-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, HW2_EX4_A[i]));
+  });
+}
+
+// ── HW3 check functions ───────────────────────────────────────────────────
+
+function checkHW3Ex1() {
+  HW3_EX1_LINES.forEach((_, i) => {
+    const inp = document.getElementById(`hw3ex1-item${i}`);
+    const fb  = document.getElementById(`fb-hw3ex1-${i}`);
+    if (!inp) return;
+    const val = inp.value.trim();
+    const chk = val === '' ? { result: 'empty', issues: [] }
+      : val === HW3_EX1_ANSWERS[i] ? { result: 'correct', issues: [] }
+      : { result: 'incorrect', issues: [] };
+    applyFeedback(inp, fb, chk);
+  });
+}
+
+function checkHW3Ex2() {
+  HW3_COUNTRIES.forEach((_, i) => {
+    const inp = document.getElementById(`hw3ex2-item${i}`);
+    const fb  = document.getElementById(`fb-hw3ex2-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, HW3_NATIONALITIES[i]));
+  });
+}
+
+function checkHW3Ex3() {
+  HW3_EX3_FLAGS.forEach((flag, i) => {
+    const inp = document.getElementById(`hw3ex3-item${i}`);
+    const fb  = document.getElementById(`fb-hw3ex3-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, flag.name));
+  });
+}
+
+function checkHW3Ex4() {
+  HW3_EX4_PEOPLE.forEach((person, i) => {
+    const inp = document.getElementById(`hw3ex4-item${i}`);
+    const fb  = document.getElementById(`fb-hw3ex4-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, person.answer));
+  });
+}
+
+function checkHW3Ex5() {
+  HW3_EX5_Q.forEach((_, i) => {
+    const inp = document.getElementById(`hw3ex5-item${i}`);
+    const fb  = document.getElementById(`fb-hw3ex5-${i}`);
+    if (inp) applyFeedback(inp, fb, fuzzyCheck(inp.value, HW3_EX5_A[i]));
+  });
+}
+
+// ── HW2 Builder ───────────────────────────────────────────────────────────
+
+function buildHW2(audioFiles) {
+  return `
+    <div class="hw-obs">
+      Obs.: A quantidade de exercícios e o grau de dificuldade aumentarão de acordo com sua evolução no curso.
+    </div>
+
+    <h2 style="font-size:1.2rem;font-weight:800;color:var(--color-accent);margin-bottom:28px">
+      Aula 2 – Nice to meet you, too
+    </h2>
+
+    <!-- Exercise 1 -->
+    <div class="hw-exercise">
+      ${exHeader(1, 'Translate the sentences into English:', '(Traduza as frases para o inglês)', audioFiles, 'ex1')}
+      <div class="hw-translate-list">
+        ${HW2_EX1_Q.map((q, i) => `
+          <div class="hw-translate-item">
+            <div class="hw-translate-question">
+              <span style="color:var(--color-accent);font-weight:700">${String.fromCharCode(97+i)})</span> ${q}
+            </div>
+            <input type="text" class="hw-match-input" id="hw2ex1-item${i}"
+              placeholder="Sua tradução em inglês…"
+              value="${escHtml(getSaved('hw2ex1','item'+i))}"
+              oninput="saveAnswer('hw2ex1','item${i}',this.value)" />
+            <div class="check-feedback" id="fb-hw2ex1-${i}"></div>
+          </div>`).join('')}
+      </div>
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW2Ex1()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw2ex1-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw2ex1-key">
+        <strong>Gabarito:</strong><br>
+        ${HW2_EX1_A.map((a, i) => `${String.fromCharCode(97+i)}) ${a}`).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>
+
+    <!-- Exercise 2 -->
+    <div class="hw-exercise">
+      ${exHeader(2, 'Write the correct expression for each picture:', '(Escreva a expressão correta para cada foto)', audioFiles, 'ex2')}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px">
+        ${HW2_EX2_PICS.map((pic, i) => `
+          <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:16px;border:1px solid var(--color-border);text-align:center">
+            <div style="font-size:2.8rem;margin-bottom:8px">${pic.emoji}</div>
+            <div style="font-size:0.78rem;color:var(--color-text-muted);margin-bottom:12px">${pic.scene}</div>
+            <div style="font-weight:700;color:var(--color-accent);margin-bottom:8px;text-align:left">${String.fromCharCode(97+i)})</div>
+            <input type="text" class="hw-match-input" id="hw2ex2-item${i}"
+              placeholder="Expressão em inglês…"
+              value="${escHtml(getSaved('hw2ex2','item'+i))}"
+              oninput="saveAnswer('hw2ex2','item${i}',this.value)" />
+            <div class="check-feedback" id="fb-hw2ex2-${i}"></div>
+          </div>`).join('')}
+      </div>
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW2Ex2()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw2ex2-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw2ex2-key">
+        <strong>Gabarito:</strong>
+        a) Good morning &nbsp;|&nbsp; b) Good evening &nbsp;|&nbsp; c) Good night &nbsp;|&nbsp; d) Good afternoon
+      </div>
+    </div>
+
+    <!-- Exercise 3 -->
+    <div class="hw-exercise">
+      ${exHeader(3, 'Correct the mistakes:', '(Corrija os erros)', audioFiles, 'ex3')}
+      <div class="hw-translate-list">
+        ${HW2_EX3_Q.map((q, i) => `
+          <div class="hw-translate-item">
+            <div class="hw-translate-question">
+              <span style="color:var(--color-accent);font-weight:700">${String.fromCharCode(97+i)})</span>
+              <span style="color:#ff6b6b;text-decoration:line-through">${q}</span>
+            </div>
+            <input type="text" class="hw-match-input" id="hw2ex3-item${i}"
+              placeholder="Frase corrigida…"
+              value="${escHtml(getSaved('hw2ex3','item'+i))}"
+              oninput="saveAnswer('hw2ex3','item${i}',this.value)" />
+            <div class="check-feedback" id="fb-hw2ex3-${i}"></div>
+          </div>`).join('')}
+      </div>
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW2Ex3()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw2ex3-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw2ex3-key">
+        <strong>Gabarito:</strong><br>
+        ${HW2_EX3_A.map((a, i) => `${String.fromCharCode(97+i)}) ${a}`).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>
+
+    <!-- Exercise 4 -->
+    <div class="hw-exercise">
+      ${exHeader(4, 'Unscramble the sentences:', '(Desembaralhe as frases)', audioFiles, 'ex4')}
+      <div class="hw-translate-list">
+        ${HW2_EX4_SCRAMBLED.map((q, i) => `
+          <div class="hw-translate-item">
+            <div class="hw-translate-question">
+              <span style="color:var(--color-accent);font-weight:700">${String.fromCharCode(97+i)})</span>
+              <span style="color:var(--color-text-muted)">${q}</span>
+            </div>
+            <input type="text" class="hw-match-input" id="hw2ex4-item${i}"
+              placeholder="Frase correta…"
+              value="${escHtml(getSaved('hw2ex4','item'+i))}"
+              oninput="saveAnswer('hw2ex4','item${i}',this.value)" />
+            <div class="check-feedback" id="fb-hw2ex4-${i}"></div>
+          </div>`).join('')}
+      </div>
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW2Ex4()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw2ex4-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw2ex4-key">
+        <strong>Gabarito:</strong><br>
+        ${HW2_EX4_A.map((a, i) => `${String.fromCharCode(97+i)}) ${a}`).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>
+
+    <!-- Exercise 5 -->
+    <div class="hw-exercise">
+      ${exHeader(5, 'Answer these questions about you:', '(Responda essas perguntas sobre você)', audioFiles, 'ex5')}
+      <div class="hw-translate-list">
+        ${HW2_EX5_Q.map((q, i) => `
+          <div class="hw-translate-item">
+            <div class="hw-translate-question">
+              <span style="color:var(--color-accent);font-weight:700">${String.fromCharCode(97+i)})</span> ${q}
+            </div>
+            <input type="text" class="hw-match-input" id="hw2ex5-item${i}"
+              placeholder="Sua resposta em inglês…"
+              value="${escHtml(getSaved('hw2ex5','item'+i))}"
+              oninput="saveAnswer('hw2ex5','item${i}',this.value)" />
+          </div>`).join('')}
+      </div>
+      <div class="hw-actions">
+        <button class="btn btn-ghost" onclick="toggleAnswerKey('hw2ex5-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Exemplo de respostas</button>
+      </div>
+      <div class="hw-answer-key" id="hw2ex5-key">
+        <strong>Exemplo:</strong> As respostas são pessoais — use seu nome, origem e informações reais.
+      </div>
+    </div>
+
+    <!-- Exercise 6 -->
+    <div class="hw-exercise">
+      <div class="hw-exercise-header">
+        <div class="hw-ex-meta">
+          <div class="hw-exercise-title">6. Repeat the sentences from exercises 1 to 4 along with the audio:</div>
+          <div class="hw-exercise-subtitle">(Repita as frases dos exercícios 1 a 4 junto com o áudio)</div>
+        </div>
+      </div>
+      <p style="font-size:0.88rem;color:var(--color-text-muted);padding:4px 0">
+        ☝️ Use os mini-players ao lado de cada exercício acima, ou o player completo na seção abaixo.
+      </p>
+    </div>
+  `;
+}
+
+// ── HW3 Builder ───────────────────────────────────────────────────────────
+
+function buildHW3(audioFiles) {
+  return `
+    <div class="hw-obs">
+      Obs.: A quantidade de exercícios e o grau de dificuldade aumentarão de acordo com sua evolução no curso.
+    </div>
+
+    <h2 style="font-size:1.2rem;font-weight:800;color:var(--color-accent);margin-bottom:28px">
+      Aula 3 – Where are you from?
+    </h2>
+
+    <!-- Exercise 1: Unscramble the dialogue -->
+    <div class="hw-exercise">
+      ${exHeader(1, 'Unscramble the dialogue:', '(Desembaralhe o diálogo — escreva o número de ordem ao lado de cada fala)', audioFiles, 'ex1')}
+
+      <div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start">
+        <div>
+          ${HW3_EX1_LINES.map((line, i) => `
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <input type="number" min="1" max="8"
+                id="hw3ex1-item${i}"
+                placeholder="?"
+                value="${escHtml(getSaved('hw3ex1','item'+i))}"
+                oninput="saveAnswer('hw3ex1','item${i}',this.value)"
+                style="width:52px;flex-shrink:0;text-align:center;background:var(--color-card);border:1px solid var(--color-border);color:var(--color-text);border-radius:8px;padding:6px;font-size:0.9rem;font-family:Poppins,sans-serif" />
+              <div class="hw-line" style="margin:0;flex:1">
+                <span class="hw-speaker ${line.speaker === 'Brian' ? 'brian' : 'jr'}">${line.speaker}:</span>
+                <span${line.bold ? ' style="font-weight:700"' : ''}>${line.text}</span>
+              </div>
+              <div class="check-feedback" id="fb-hw3ex1-${i}" style="min-width:60px;font-size:0.78rem"></div>
+            </div>`).join('')}
+        </div>
+        <div class="hw-notes-col" style="min-width:140px">
+          <div class="hw-notes-col-title">YOUR NOTES<br/>(SUAS ANOTAÇÕES):</div>
+          <textarea id="hw3ex1-notes"
+            style="width:100%;min-height:120px;background:transparent;border:none;border-bottom:1px solid var(--color-border);color:var(--color-text);font-size:0.8rem;resize:vertical;outline:none;font-family:Poppins,sans-serif;padding:4px 0"
+            placeholder="Suas anotações…"
+            oninput="saveAnswer('hw3ex1','notes',this.value)"
+          >${escHtml(getSaved('hw3ex1','notes'))}</textarea>
+        </div>
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW3Ex1()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar ordem</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw3ex1-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw3ex1-key">
+        <strong>Gabarito (ordem correta):</strong><br>
+        (1) Brian: So, tell me Junior... where are you from?<br>
+        (2) Jr: I'm from Brazil, what about you?<br>
+        (3) Brian: I'm from the USA.<br>
+        (4) Jr: Great! Where are you from in the USA?<br>
+        (5) Brian: I'm from San Francisco. And you? Are you from Rio de Janeiro?<br>
+        (6) Jr: No, I'm from Sao Paulo.<br>
+        (7) Brian: Nice! São Paulo is a big city.<br>
+        (8) Jr: Yes, it is.
+      </div>
+    </div>
+
+    <!-- Exercise 2: Match countries and nationalities -->
+    <div class="hw-exercise">
+      ${exHeader(2, 'Match the countries and the nationalities:', '(Relacione os países e as nacionalidades)', audioFiles, 'ex2')}
+
+      <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:20px;border:1px solid var(--color-border)">
+        <div style="display:grid;grid-template-columns:30px 140px 1fr;gap:8px;margin-bottom:10px;font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--color-text-muted)">
+          <div>#</div><div>País (Country)</div><div>Nacionalidade</div>
+        </div>
+        ${HW3_COUNTRIES.map((country, i) => `
+          <div style="display:grid;grid-template-columns:30px 140px 1fr;gap:8px;align-items:center;margin-bottom:8px">
+            <div style="color:var(--color-text-muted);font-size:0.85rem">${i+1}.</div>
+            <div style="font-weight:600;color:var(--color-text);font-size:0.9rem">${country}</div>
+            <div>
+              <input type="text" class="hw-match-input" id="hw3ex2-item${i}"
+                placeholder="Nacionalidade…"
+                value="${escHtml(getSaved('hw3ex2','item'+i))}"
+                oninput="saveAnswer('hw3ex2','item${i}',this.value)" />
+              <div class="check-feedback" id="fb-hw3ex2-${i}"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW3Ex2()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw3ex2-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw3ex2-key">
+        <strong>Gabarito:</strong><br>
+        ${HW3_COUNTRIES.map((c, i) => `${i+1}. ${c} → ${HW3_NATIONALITIES[i]}`).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>
+
+    <!-- Exercise 3: Flags -->
+    <div class="hw-exercise">
+      ${exHeader(3, 'Write the names of the country under each flag:', '(Escreva o nome do país em baixo de cada bandeira)', audioFiles, 'ex3')}
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        ${HW3_EX3_FLAGS.map((flag, i) => `
+          <div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:16px;border:1px solid var(--color-border);text-align:center">
+            <div style="font-size:4rem;margin-bottom:8px">${flag.emoji}</div>
+            <div style="font-weight:700;color:var(--color-accent);margin-bottom:8px">${String.fromCharCode(97+i)})</div>
+            <input type="text" class="hw-match-input" id="hw3ex3-item${i}"
+              placeholder="Nome do país…"
+              value="${escHtml(getSaved('hw3ex3','item'+i))}"
+              oninput="saveAnswer('hw3ex3','item${i}',this.value)" />
+            <div class="check-feedback" id="fb-hw3ex3-${i}"></div>
+          </div>`).join('')}
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW3Ex3()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw3ex3-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw3ex3-key">
+        <strong>Gabarito:</strong>
+        a) Colombia &nbsp;|&nbsp; b) France &nbsp;|&nbsp; c) Brazil &nbsp;|&nbsp; d) The USA
+      </div>
+    </div>
+
+    <!-- Exercise 4: Celebrities -->
+    <div class="hw-exercise">
+      ${exHeader(4, 'What are their names? And where are they from?', '(Quais são os nomes deles? E de onde eles são?)', audioFiles, 'ex4')}
+
+      <div class="hw-translate-list">
+        <div class="hw-translate-item" style="opacity:0.65">
+          <div class="hw-translate-question">
+            <span style="color:var(--color-accent);font-weight:700">a)</span>
+            <span style="font-size:0.82rem;color:var(--color-text-muted)">🎤 Cantora brasileira</span>
+          </div>
+          <div style="font-style:italic;font-size:0.88rem;padding:4px 0;color:var(--color-text-muted)">
+            Exemplo dado: She's Ivete Sangalo. She's from Brazil.
+          </div>
+        </div>
+        ${HW3_EX4_PEOPLE.map((p, i) => `
+          <div class="hw-translate-item">
+            <div class="hw-translate-question">
+              <span style="color:var(--color-accent);font-weight:700">${p.label}</span>
+              <span style="font-size:0.82rem;color:var(--color-text-muted)">${p.hint}</span>
+            </div>
+            <input type="text" class="hw-match-input" id="hw3ex4-item${i}"
+              placeholder="He's / She's … from …"
+              value="${escHtml(getSaved('hw3ex4','item'+i))}"
+              oninput="saveAnswer('hw3ex4','item${i}',this.value)" />
+            <div class="check-feedback" id="fb-hw3ex4-${i}"></div>
+          </div>`).join('')}
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW3Ex4()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw3ex4-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw3ex4-key">
+        <strong>Gabarito:</strong><br>
+        a) She's Ivete Sangalo. She's from Brazil.<br>
+        b) She's Queen Elizabeth II. She's from England.<br>
+        c) He's Leonardo Di Caprio. He's from the USA.<br>
+        d) He's Michael Schumacher. He's from Germany.
+      </div>
+    </div>
+
+    <!-- Exercise 5: Translate -->
+    <div class="hw-exercise">
+      ${exHeader(5, 'Translate the sentences from Portuguese into English:', '(Traduza as frases do português para o inglês)', audioFiles, 'ex5')}
+
+      <div class="hw-translate-list">
+        ${HW3_EX5_Q.map((q, i) => `
+          <div class="hw-translate-item">
+            <div class="hw-translate-question">
+              <span style="color:var(--color-accent);font-weight:700">${String.fromCharCode(97+i)})</span> ${q}
+            </div>
+            <input type="text" class="hw-match-input" id="hw3ex5-item${i}"
+              placeholder="Tradução em inglês…"
+              value="${escHtml(getSaved('hw3ex5','item'+i))}"
+              oninput="saveAnswer('hw3ex5','item${i}',this.value)" />
+            <div class="check-feedback" id="fb-hw3ex5-${i}"></div>
+          </div>`).join('')}
+      </div>
+
+      <div class="hw-actions">
+        <button class="btn btn-outline" onclick="checkHW3Ex5()" style="font-size:0.82rem;padding:8px 16px">✔ Verificar</button>
+        <button class="btn btn-ghost"   onclick="toggleAnswerKey('hw3ex5-key')" style="font-size:0.82rem;padding:8px 16px">🔑 Gabarito</button>
+      </div>
+      <div class="hw-answer-key" id="hw3ex5-key">
+        <strong>Gabarito:</strong><br>
+        ${HW3_EX5_A.map((a, i) => `${String.fromCharCode(97+i)}) ${a}`).join(' &nbsp;|&nbsp; ')}
+      </div>
+    </div>
+
+    <!-- Exercise 6 -->
+    <div class="hw-exercise">
+      <div class="hw-exercise-header">
+        <div class="hw-ex-meta">
+          <div class="hw-exercise-title">6. Repeat the sentences from exercises 1 to 5 along with the audio:</div>
+          <div class="hw-exercise-subtitle">(Repita as frases dos exercícios 1 a 5 junto com o áudio)</div>
+        </div>
+      </div>
+      <p style="font-size:0.88rem;color:var(--color-text-muted);padding:4px 0">
+        ☝️ Use os mini-players ao lado de cada exercício acima, ou o player completo na seção abaixo.
+      </p>
+    </div>
+  `;
+}
+
+// ── Generic HW fallback (aulas futuras) ──────────────────────────────────
+
+function buildHWGeneric(audioFiles) {
+  if (!audioFiles.length) {
+    return `<p style="color:var(--color-text-muted);font-size:0.9rem;text-align:center;padding:24px 0">
+      📄 Nenhum arquivo de homework encontrado para esta aula.
+    </p>`;
+  }
+  return `
+    <div class="hw-obs">
+      Os exercícios desta aula ainda não foram adicionados ao sistema.
+      Utilize os áudios disponíveis no player abaixo e o PDF impresso para praticar.
+    </div>
+    <p style="color:var(--color-text-muted);font-size:0.88rem;padding:8px 0">
+      ${audioFiles.length} arquivo(s) de áudio disponível(is) — acesse-os no player completo abaixo.
+    </p>`;
 }
 
 // ── Homework answer persistence ───────────────────────────────────────────
@@ -892,6 +1435,17 @@ function friendlyName(filename) {
     'homework1_ex2.mp3':   '📢 Exercício 2',
     'homework1_ex3.mp3':   '📢 Exercício 3',
     'homework1_ex4.mp3':   '📢 Exercício 4',
+    'dialogue_aula2.mp3':  '🎭 Diálogo — Aula 2',
+    'homework2_ex1.mp3':   '📢 Exercício 1',
+    'homework2_ex2.mp3':   '📢 Exercício 2',
+    'homework2_ex3.mp3':   '📢 Exercício 3',
+    'homework2_ex4.mp3':   '📢 Exercício 4',
+    'homework2_ex5.mp3':   '📢 Exercício 5',
+    'dialogue_aula3.mp3':  '🎭 Diálogo — Aula 3',
+    'homework3_ex2.mp3':   '📢 Exercício 2',
+    'homework3_ex3.mp3':   '📢 Exercício 3',
+    'homework3_ex4.mp3':   '📢 Exercício 4',
+    'homework3_ex5.mp3':   '📢 Exercício 5',
   };
   return map[filename] || ('🎵 ' + filename.replace(/\.[^.]+$/, '').replace(/_/g, ' '));
 }
